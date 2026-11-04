@@ -4,6 +4,7 @@ import { randomBytes } from 'node:crypto';
 import { fileURLToPath } from 'node:url';
 import { Gate } from './core.js';
 import { createDraftPr, probe } from './github.js';
+import { museProposal } from './meta.js';
 
 const real = process.env.B1_REAL_EXECUTION === '1';
 const approvalCode = randomBytes(5).toString('hex');
@@ -15,12 +16,13 @@ const server = http.createServer(async (req, res) => {
   const route = req.url?.split('?')[0];
   if (req.method === 'GET' && route === '/') { res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'no-store' }); return res.end(page); }
   if (req.method === 'GET' && route === '/api/state') return json(res, 200, { mode: real ? 'REAL_GITHUB' : 'SIMULATION', jobs: [...gate.jobs.values()].map(j => structuredClone(j)), ledger: gate.ledger, ledgerValid: gate.verifyLedger() });
-  if (req.method !== 'POST' || !['/api/propose', '/api/approve', '/api/execute', '/api/reconcile'].includes(route)) return json(res, 404, { error: 'Not found' });
+  if (req.method !== 'POST' || !['/api/propose', '/api/approve', '/api/execute', '/api/reconcile', '/api/meta/propose'].includes(route)) return json(res, 404, { error: 'Not found' });
   try {
     let raw = '';
     for await (const chunk of req) { raw += chunk; if (raw.length > 10000) throw Error('Request too large'); }
     const input = JSON.parse(raw);
     let result;
+    if (route === '/api/meta/propose') result = gate.propose(await museProposal(input.request));
     if (route === '/api/propose') result = gate.propose(input.effect);
     if (route === '/api/approve') result = gate.approve(input.id, input.effectHash, input.approvalCode);
     if (route === '/api/execute') {
