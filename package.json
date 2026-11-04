@@ -1,0 +1,12 @@
+{
+  "name": "b1-gate-local-mvp",
+  "version": "0.1.0",
+  "private": true,
+  "description": "B1 Gate — local governed execution demonstration",
+  "type": "module",
+  "scripts": {
+    "start": "node src/server.js",
+    "test": "node --test"
+  },
+  "engines": {"node": ">=20"}
+}
