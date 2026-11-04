@@ -7,3 +7,6 @@ node_modules/
 *.pem
 *.key
 .DS_Store
+
+# Local execution evidence - review before publishing
+b1-*-evidence.json
