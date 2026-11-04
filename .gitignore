@@ -10,3 +10,5 @@ node_modules/
 
 # Local execution evidence - review before publishing
 b1-*-evidence.json
+
+*.bak

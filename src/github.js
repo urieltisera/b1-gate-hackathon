@@ -7,7 +7,7 @@ export function ghApi(endpoint, method = 'GET', body = null, timeoutMs = 20000) 
   return new Promise((resolve, reject) => {
     const args = ['api', endpoint, '-X', method];
     if (body !== null) args.push('--input', '-');
-    const proc = spawn('gh', args, { shell: false, windowsHide: true, stdio: ['pipe', 'pipe', 'pipe'] });
+    const proc = spawn(process.env.B1_GH_PATH || 'gh', args, { shell: false, windowsHide: true, stdio: ['pipe', 'pipe', 'pipe'] });
     let output = '', errors = '', timedOut = false;
     const timeout = setTimeout(() => { timedOut = true; proc.kill(); }, timeoutMs);
     proc.stdout.on('data', c => { output += c; if (output.length > 300000) proc.kill(); });
